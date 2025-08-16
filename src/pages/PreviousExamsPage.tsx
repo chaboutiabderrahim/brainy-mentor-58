@@ -226,59 +226,67 @@ export default function PreviousExamsPage() {
                     return (
                       <div
                         key={exam.id}
-                        className="flex items-center justify-between p-4 bg-muted/30 rounded-lg"
+                        className="border border-border/50 rounded-xl p-4 bg-card shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/30"
                       >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-medium text-foreground">
-                              {exam.session === 'main' ? 'الدورة الرئيسية' : 'دورة الاستدراك'}
-                            </h4>
-                            <div className="flex">
-                              {Array.from({ length: exam.difficulty_level }).map((_, i) => (
-                                <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                              ))}
+                        <div className="space-y-4">
+                          {/* Exam Header */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold text-foreground text-base">
+                                  {exam.session === 'main' ? 'الدورة الرئيسية' : 'دورة الاستدراك'}
+                                </h4>
+                                <div className="flex">
+                                  {Array.from({ length: exam.difficulty_level }).map((_, i) => (
+                                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded-md">
+                                  <Clock className="w-3.5 h-3.5" />
+                                  {exam.duration_minutes} دقيقة
+                                </span>
+                                {examFileUrl && (
+                                  <span className="text-green-600 text-sm font-medium bg-green-50 px-2 py-1 rounded-md">
+                                    ✓ متوفر
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {exam.duration_minutes} دقيقة
-                            </span>
-                            {examFileUrl && (
-                              <span className="text-green-600 text-xs">✓ متوفر</span>
-                            )}
+                          
+                          {/* Action Buttons */}
+                          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => examFileUrl ? window.open(examFileUrl, '_blank') : handleDownload(exam.id, 'exam')}
+                              className="h-10 flex-1 border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5"
+                              disabled={!examFileUrl}
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              تحميل الامتحان
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDownload(exam.id, 'solution')}
+                              className="h-10 flex-1 border-2 border-accent/20 hover:border-accent/50 hover:bg-accent/5"
+                            >
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                              تحميل الحل
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleAISolve(exam.id)}
+                              className="h-10 flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-2 border-purple-300 hover:border-purple-400 shadow-md hover:shadow-lg"
+                            >
+                              <Star className="w-4 h-4 mr-2" />
+                              حل بالذكاء الاصطناعي
+                            </Button>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => examFileUrl ? window.open(examFileUrl, '_blank') : handleDownload(exam.id, 'exam')}
-                            className="h-8"
-                            disabled={!examFileUrl}
-                          >
-                            <Download className="w-3 h-3 mr-1" />
-                            الامتحان
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDownload(exam.id, 'solution')}
-                            className="h-8"
-                          >
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            الحل
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="default"
-                            onClick={() => handleAISolve(exam.id)}
-                            className="h-8 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                          >
-                            <Star className="w-3 h-3 mr-1" />
-                            حل بالذكاء الاصطناعي
-                          </Button>
                         </div>
                       </div>
                     );
