@@ -32,11 +32,28 @@ interface AuthState {
 }
 
 export const useAuth = (): AuthState => {
-  // Mock auth state - no backend connection
+  // Mock auth state - authenticated user for testing
   return {
-    user: null,
-    session: null,
-    profile: null,
+    user: {
+      id: 'mock-user-id',
+      email: 'user@example.com',
+      created_at: '2024-01-15T10:30:00Z'
+    },
+    session: {
+      access_token: 'mock-token',
+      user: {
+        id: 'mock-user-id',
+        email: 'user@example.com'
+      }
+    },
+    profile: {
+      id: 'mock-profile-id',
+      user_id: 'mock-user-id',
+      display_name: 'Ahmed',
+      stream_id: null,
+      graduation_year: null,
+      role: 'regular_student'
+    },
     loading: false,
   };
 };
