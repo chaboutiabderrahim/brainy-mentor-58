@@ -18,6 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, GraduationCap } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -32,15 +33,72 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Mock authentication - redirect to home after delay
-    setTimeout(() => {
+    try {
+      if (isSignUp) {
+        const redirectUrl = `${window.location.origin}/`;
+        
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectUrl,
+            data: {
+              display_name: displayName,
+            }
+          }
+        });
+
+        if (error) {
+          toast({
+            title: "خطأ في إنشاء الحساب",
+            description: error.message,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (data.user && !data.session) {
+          toast({
+            title: "تم إنشاء الحساب بنجاح",
+            description: "يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب",
+          });
+        } else {
+          toast({
+            title: "تم إنشاء الحساب بنجاح",
+            description: "مرحباً بك في التطبيق",
+          });
+          navigate('/');
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          toast({
+            title: "خطأ في تسجيل الدخول",
+            description: error.message,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        toast({
+          title: "تم تسجيل الدخول بنجاح",
+          description: "مرحباً بك في التطبيق",
+        });
+        navigate('/');
+      }
+    } catch (error) {
       toast({
-        title: isSignUp ? "تم إنشاء الحساب بنجاح" : "تم تسجيل الدخول بنجاح",
-        description: "مرحباً بك في التطبيق",
+        title: "خطأ",
+        description: "حدث خطأ غير متوقع",
+        variant: "destructive",
       });
-      navigate('/');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (

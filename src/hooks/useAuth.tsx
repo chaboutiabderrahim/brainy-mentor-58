@@ -13,47 +13,92 @@
  * - Defers profile fetching with setTimeout to avoid recursive calls
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
-interface Profile {
+interface Student {
   id: string;
   user_id: string;
-  display_name: string | null;
-  stream_id: string | null;
-  graduation_year: number | null;
-  role: string;
+  name: string;
+  stream: string;
+  year_of_study: number;
+  whatsapp: string | null;
 }
 
 interface AuthState {
-  user: any | null;
-  session: any | null;
-  profile: Profile | null;
+  user: User | null;
+  session: Session | null;
+  student: Student | null;
   loading: boolean;
 }
 
 export const useAuth = (): AuthState => {
-  // Mock auth state - authenticated user for testing
-  return {
-    user: {
-      id: 'mock-user-id',
-      email: 'user@example.com',
-      created_at: '2024-01-15T10:30:00Z'
-    },
-    session: {
-      access_token: 'mock-token',
-      user: {
-        id: 'mock-user-id',
-        email: 'user@example.com'
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [student, setStudent] = useState<Student | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Defer student profile fetching to avoid recursive calls
+        if (session?.user) {
+          setTimeout(() => {
+            fetchStudentProfile(session.user.id);
+          }, 0);
+        } else {
+          setStudent(null);
+        }
+        
+        setLoading(false);
       }
-    },
-    profile: {
-      id: 'mock-profile-id',
-      user_id: 'mock-user-id',
-      display_name: 'Ahmed',
-      stream_id: null,
-      graduation_year: null,
-      role: 'regular_student'
-    },
-    loading: false,
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        setTimeout(() => {
+          fetchStudentProfile(session.user.id);
+        }, 0);
+      }
+      
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchStudentProfile = async (userId: string) => {
+    try {
+      const { data: studentData, error } = await supabase
+        .from('students')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching student profile:', error);
+        return;
+      }
+
+      setStudent(studentData || null);
+    } catch (error) {
+      console.error('Error fetching student profile:', error);
+    }
+  };
+
+  return {
+    user,
+    session,
+    student,
+    loading,
   };
 };
