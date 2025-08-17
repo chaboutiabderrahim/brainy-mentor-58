@@ -21,75 +21,36 @@ import { Loader2, GraduationCap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function AuthPage() {
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('demo@thesmart.ma');
+  const [password, setPassword] = useState('demo123');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Demo user login function
+  const handleDemoLogin = async () => {
+
     setLoading(true);
-
     try {
-      if (isSignUp) {
-        const redirectUrl = `${window.location.origin}/`;
-        
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: redirectUrl,
-            data: {
-              display_name: displayName,
-            }
-          }
-        });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: 'demo@thesmart.ma',
+        password: 'demo123',
+      });
 
-        if (error) {
-          toast({
-            title: "خطأ في إنشاء الحساب",
-            description: error.message,
-            variant: "destructive",
-          });
-          return;
-        }
-
-        if (data.user && !data.session) {
-          toast({
-            title: "تم إنشاء الحساب بنجاح",
-            description: "يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب",
-          });
-        } else {
-          toast({
-            title: "تم إنشاء الحساب بنجاح",
-            description: "مرحباً بك في التطبيق",
-          });
-          navigate('/');
-        }
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          toast({
-            title: "خطأ في تسجيل الدخول",
-            description: error.message,
-            variant: "destructive",
-          });
-          return;
-        }
-
+      if (error) {
         toast({
-          title: "تم تسجيل الدخول بنجاح",
-          description: "مرحباً بك في التطبيق",
+          title: "خطأ في تسجيل الدخول",
+          description: error.message,
+          variant: "destructive",
         });
-        navigate('/');
+        return;
       }
+
+      toast({
+        title: "تم تسجيل الدخول بنجاح",
+        description: "مرحباً بك في التطبيق",
+      });
+      navigate('/');
     } catch (error) {
       toast({
         title: "خطأ",
@@ -121,87 +82,56 @@ export default function AuthPage() {
         <Card className="w-full shadow-elevated">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl text-center">
-              {isSignUp ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+              تسجيل الدخول التجريبي
             </CardTitle>
             <CardDescription className="text-center">
-              {isSignUp 
-                ? 'أدخل بياناتك لإنشاء حساب جديد' 
-                : 'أدخل بياناتك للوصول إلى حسابك'
-              }
+              اضغط الزر للدخول بحساب تجريبي
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAuth} className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="displayName">الاسم</Label>
-                  <Input
-                    id="displayName"
-                    type="text"
-                    placeholder="أدخل اسمك"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    required={isSignUp}
-                    className="h-12"
-                  />
-                </div>
-              )}
-              
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Label htmlFor="email">البريد الإلكتروني (تجريبي)</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="أدخل بريدك الإلكتروني"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  disabled
                   className="h-12"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">كلمة المرور</Label>
+                <Label htmlFor="password">كلمة المرور (تجريبية)</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="أدخل كلمة المرور"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  disabled
                   className="h-12"
-                  minLength={6}
                 />
               </div>
               
               <Button 
-                type="submit" 
+                onClick={handleDemoLogin}
                 className="w-full h-12 bg-gradient-primary text-white font-medium"
                 disabled={loading}
               >
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {isSignUp ? 'جاري إنشاء الحساب...' : 'جاري تسجيل الدخول...'}
+                    جاري تسجيل الدخول...
                   </>
                 ) : (
-                  isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول'
+                  'دخول تجريبي'
                 )}
               </Button>
-            </form>
+            </div>
             
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-primary hover:text-primary-glow transition-colors text-sm"
-              >
-                {isSignUp 
-                  ? 'لديك حساب بالفعل؟ سجل الدخول' 
-                  : 'ليس لديك حساب؟ أنشئ حساباً جديداً'
-                }
-              </button>
-              
+            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+              <p className="text-sm text-center text-muted-foreground">
+                هذا حساب تجريبي لاستكشاف التطبيق. جميع البيانات هي بيانات تجريبية.
+              </p>
             </div>
           </CardContent>
         </Card>

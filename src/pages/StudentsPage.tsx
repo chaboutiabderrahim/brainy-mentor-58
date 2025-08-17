@@ -13,6 +13,8 @@
 
 import { useState } from "react";
 import { MobileHeader } from "@/components/layout/MobileHeader";
+import { BookingForm } from "@/components/BookingForm";
+import { AlumniForm } from "@/components/AlumniForm";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -125,16 +127,49 @@ const successfulStudents = [
 
 export default function StudentsPage() {
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [showAlumniForm, setShowAlumniForm] = useState(false);
+  const [bookingStudentName, setBookingStudentName] = useState('');
 
   const handleBookSession = (studentId: string) => {
-    // In production, this would open a booking modal or navigate to booking page
-    alert(`Booking session with ${successfulStudents.find(s => s.id === studentId)?.name}`);
+    const student = successfulStudents.find(s => s.id === studentId);
+    if (student) {
+      setBookingStudentName(student.name);
+      setShowBookingForm(true);
+    }
   };
 
   const handleWatchVideo = (videoTitle: string) => {
     // In production, this would open video player
     alert(`Playing: ${videoTitle}`);
   };
+
+  // Show booking form modal
+  if (showBookingForm) {
+    return (
+      <div className="min-h-screen bg-gradient-bg pb-20">
+        <MobileHeader userName="Ahmed" userScore={2450} />
+        <div className="p-4 max-w-md mx-auto flex items-center justify-center min-h-[60vh]">
+          <BookingForm 
+            studentName={bookingStudentName}
+            onClose={() => setShowBookingForm(false)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Show alumni registration form
+  if (showAlumniForm) {
+    return (
+      <div className="min-h-screen bg-gradient-bg pb-20">
+        <MobileHeader userName="Ahmed" userScore={2450} />
+        <div className="p-4 max-w-md mx-auto flex items-center justify-center min-h-[60vh]">
+          <AlumniForm onClose={() => setShowAlumniForm(false)} />
+        </div>
+      </div>
+    );
+  }
 
   if (selectedStudent) {
     const student = successfulStudents.find(s => s.id === selectedStudent)!;
@@ -405,8 +440,25 @@ export default function StudentsPage() {
                 <p className="text-xs text-muted-foreground">Ask questions and solve exams together</p>
               </div>
             </div>
-          </div>
-        </Card>
+            </div>
+          </Card>
+
+          {/* Join as Alumni Button */}
+          <Card className="p-4 bg-gradient-primary text-white">
+            <div className="text-center space-y-3">
+              <h3 className="font-semibold">أنت خريج متفوق؟</h3>
+              <p className="text-sm opacity-90">
+                انضم إلى مجتمع الخريجين المتفوقين وساعد الطلاب الحاليين
+              </p>
+              <Button 
+                variant="secondary"
+                onClick={() => setShowAlumniForm(true)}
+                className="w-full"
+              >
+                انضم كخريج متفوق
+              </Button>
+            </div>
+          </Card>
       </div>
     </div>
   );
