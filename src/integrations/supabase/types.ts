@@ -14,16 +14,362 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alumni: {
+        Row: {
+          advice_text: string
+          approved: boolean
+          bac_score: number
+          created_at: string
+          id: string
+          name: string
+          resume_url: string | null
+          stream: Database["public"]["Enums"]["student_stream"]
+        }
+        Insert: {
+          advice_text: string
+          approved?: boolean
+          bac_score: number
+          created_at?: string
+          id?: string
+          name: string
+          resume_url?: string | null
+          stream: Database["public"]["Enums"]["student_stream"]
+        }
+        Update: {
+          advice_text?: string
+          approved?: boolean
+          bac_score?: number
+          created_at?: string
+          id?: string
+          name?: string
+          resume_url?: string | null
+          stream?: Database["public"]["Enums"]["student_stream"]
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          id: string
+          request_description: string
+          status: Database["public"]["Enums"]["booking_status"]
+          student_id: string
+          subject: string
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          request_description: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          student_id: string
+          subject: string
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          request_description?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          student_id?: string
+          subject?: string
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exams: {
+        Row: {
+          created_at: string
+          exam_pdf_url: string | null
+          id: string
+          solution_pdf_url: string | null
+          stream: Database["public"]["Enums"]["student_stream"]
+          subject_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          exam_pdf_url?: string | null
+          id?: string
+          solution_pdf_url?: string | null
+          stream: Database["public"]["Enums"]["student_stream"]
+          subject_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          exam_pdf_url?: string | null
+          id?: string
+          solution_pdf_url?: string | null
+          stream?: Database["public"]["Enums"]["student_stream"]
+          subject_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exams_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          chapter: string
+          completed_at: string | null
+          created_at: string
+          difficulty: string
+          id: string
+          questions_json: Json
+          score: number | null
+          student_id: string
+          subject_id: string
+          total_questions: number
+        }
+        Insert: {
+          chapter: string
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: string
+          id?: string
+          questions_json: Json
+          score?: number | null
+          student_id: string
+          subject_id: string
+          total_questions: number
+        }
+        Update: {
+          chapter?: string
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: string
+          id?: string
+          questions_json?: Json
+          score?: number | null
+          student_id?: string
+          subject_id?: string
+          total_questions?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quizzes_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      students: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          stream: Database["public"]["Enums"]["student_stream"]
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+          year_of_study: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          stream: Database["public"]["Enums"]["student_stream"]
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+          year_of_study: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          stream?: Database["public"]["Enums"]["student_stream"]
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+          year_of_study?: number
+        }
+        Relationships: []
+      }
+      subjects: {
+        Row: {
+          chapters: Json
+          created_at: string
+          id: string
+          name: string
+          stream: Database["public"]["Enums"]["student_stream"]
+        }
+        Insert: {
+          chapters?: Json
+          created_at?: string
+          id?: string
+          name: string
+          stream: Database["public"]["Enums"]["student_stream"]
+        }
+        Update: {
+          chapters?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          stream?: Database["public"]["Enums"]["student_stream"]
+        }
+        Relationships: []
+      }
+      summaries: {
+        Row: {
+          ai_response: string
+          chapter: string
+          created_at: string
+          id: string
+          is_cached: boolean
+          student_id: string
+          subject_id: string
+        }
+        Insert: {
+          ai_response: string
+          chapter: string
+          created_at?: string
+          id?: string
+          is_cached?: boolean
+          student_id: string
+          subject_id: string
+        }
+        Update: {
+          ai_response?: string
+          chapter?: string
+          created_at?: string
+          id?: string
+          is_cached?: boolean
+          student_id?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "summaries_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "summaries_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      videos: {
+        Row: {
+          chapter: string
+          created_at: string
+          id: string
+          subject_id: string
+          title: string
+          uploaded_by_admin: boolean
+          youtube_link: string
+        }
+        Insert: {
+          chapter: string
+          created_at?: string
+          id?: string
+          subject_id: string
+          title: string
+          uploaded_by_admin?: boolean
+          youtube_link: string
+        }
+        Update: {
+          chapter?: string
+          created_at?: string
+          id?: string
+          subject_id?: string
+          title?: string
+          uploaded_by_admin?: boolean
+          youtube_link?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "videos_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["user_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      booking_status:
+        | "first_offer"
+        | "second_offer"
+        | "third_offer"
+        | "completed"
+      student_stream:
+        | "science"
+        | "literature"
+        | "math_tech"
+        | "economics"
+        | "languages"
+      user_role: "student" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +496,21 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      booking_status: [
+        "first_offer",
+        "second_offer",
+        "third_offer",
+        "completed",
+      ],
+      student_stream: [
+        "science",
+        "literature",
+        "math_tech",
+        "economics",
+        "languages",
+      ],
+      user_role: ["student", "admin"],
+    },
   },
 } as const
