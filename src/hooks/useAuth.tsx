@@ -26,10 +26,15 @@ interface Student {
   whatsapp: string | null;
 }
 
+interface Profile {
+  role: string;
+}
+
 interface AuthState {
   user: User | null;
   session: Session | null;
   student: Student | null;
+  profile: Profile | null;
   loading: boolean;
 }
 
@@ -37,6 +42,7 @@ export const useAuth = (): AuthState => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [student, setStudent] = useState<Student | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,13 +52,15 @@ export const useAuth = (): AuthState => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Defer student profile fetching to avoid recursive calls
+        // Defer profile fetching to avoid recursive calls
         if (session?.user) {
           setTimeout(() => {
             fetchStudentProfile(session.user.id);
+            fetchUserRole(session.user.id);
           }, 0);
         } else {
           setStudent(null);
+          setProfile(null);
         }
         
         setLoading(false);
@@ -67,6 +75,7 @@ export const useAuth = (): AuthState => {
       if (session?.user) {
         setTimeout(() => {
           fetchStudentProfile(session.user.id);
+          fetchUserRole(session.user.id);
         }, 0);
       }
       
@@ -95,10 +104,30 @@ export const useAuth = (): AuthState => {
     }
   };
 
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data: roleData, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching user role:', error);
+        return;
+      }
+
+      setProfile(roleData ? { role: roleData.role } : null);
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  };
+
   return {
     user,
     session,
     student,
+    profile,
     loading,
   };
 };
