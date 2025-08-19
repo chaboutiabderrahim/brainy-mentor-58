@@ -240,6 +240,39 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          billing_interval: string
+          created_at: string
+          features: Json
+          id: string
+          is_active: boolean
+          name: string
+          plan_code: string
+          price_dzd: number
+        }
+        Insert: {
+          billing_interval?: string
+          created_at?: string
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          plan_code: string
+          price_dzd: number
+        }
+        Update: {
+          billing_interval?: string
+          created_at?: string
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          plan_code?: string
+          price_dzd?: number
+        }
+        Relationships: []
+      }
       summaries: {
         Row: {
           ai_response: string
@@ -285,6 +318,53 @@ export type Database = {
           },
         ]
       }
+      teacher_sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          notes: string | null
+          session_date: string
+          status: string
+          student_id: string | null
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          session_date: string
+          status?: string
+          student_id?: string | null
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          session_date?: string
+          status?: string
+          student_id?: string | null
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_sessions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -302,6 +382,63 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          allowed_subjects: string[] | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_code: string
+          quiz_count_current_month: number | null
+          quiz_limit_per_month: number | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          teacher_sessions_limit: number | null
+          teacher_sessions_used: number | null
+          trial_ends_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allowed_subjects?: string[] | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_code: string
+          quiz_count_current_month?: number | null
+          quiz_limit_per_month?: number | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          teacher_sessions_limit?: number | null
+          teacher_sessions_used?: number | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allowed_subjects?: string[] | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_code?: string
+          quiz_count_current_month?: number | null
+          quiz_limit_per_month?: number | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          teacher_sessions_limit?: number | null
+          teacher_sessions_used?: number | null
+          trial_ends_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -349,6 +486,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_quiz_limit: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      check_subject_access: {
+        Args: { subject_name: string; user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["user_role"]
